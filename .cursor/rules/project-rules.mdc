@@ -1,0 +1,54 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Rules for Neutral News Source App
+
+## 1. Codebase & Structure
+
+- Use Next.js with the App Router for all frontend and API routes.
+- Organize code in the `src/app` directory following Next.js conventions.
+- Use TypeScript for all code (frontend, backend, utilities).
+- All components must be functional components using React hooks.
+
+## 2. Collaboration & Workflow
+
+- All code changes must be made via pull requests and reviewed by at least one other team member.
+- Use clear, descriptive commit messages and PR titles.
+- Assign PRs to relevant team members based on the area of responsibility (see below).
+
+## 3. Team Responsibilities
+
+- **Website (Next.js):** Pete Allport, Jishnu Anandh, Aishwarya Raja
+- **Deployment (Cloudflare/Vercel):** Pete Allport, Aishwarya Raja
+- **Inference (FriendliAI/OpenAI):** Jishnu Anandh
+- **Weaviate RAG Integration:** Timothy Tan, Jishn Anandh
+
+## 4. AI & Data
+
+- Use FriendliAI for inference by default; fallback to OpenAI if needed.
+- Integrate Weaviate for Retrieval-Augmented Generation (RAG) with news articles.
+- Ensure all AI integrations are modular and can be swapped/configured via environment variables.
+
+## 5. News Sources & Neutrality
+
+- Aggregate news from both left-leaning and right-leaning sources.
+- Implement logic to present a balanced, neutral summary for each news topic.
+- Clearly document the sources and methodology for neutrality in the README.
+
+## 6. Deployment
+
+- Deploy the app to Vercel, with automated deployments from the main branch.
+- Store all secrets and API keys in environment variables, never in the codebase.
+
+## 7. Testing & Quality
+
+- Write unit and integration tests for all critical logic, especially AI and aggregation logic.
+- Use ESLint and Prettier for code quality and formatting.
+- All code must pass linting and tests before merging.
+
+## 8. Documentation
+
+- Keep the README up to date with setup, deployment, and contribution instructions.
+- Document all major architectural decisions and third-party integrations.
