@@ -27,6 +27,13 @@ export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [neutralSummaries, setNeutralSummaries] = useState<
+    Record<number, string>
+  >({});
+  const [rewriteLoading, setRewriteLoading] = useState<Record<number, boolean>>(
+    {}
+  );
+  const [rewriteError, setRewriteError] = useState<Record<number, string>>({});
 
   useEffect(() => {
     async function fetchNews() {
@@ -59,6 +66,38 @@ export default function Home() {
     fetchNews();
   }, []);
 
+  const handleRewrite = async (articleId: number, articleText: string) => {
+    setRewriteLoading((prev) => ({ ...prev, [articleId]: true }));
+    setRewriteError((prev) => ({ ...prev, [articleId]: "" }));
+    setNeutralSummaries((prev) => ({ ...prev, [articleId]: "" }));
+    try {
+      const res = await fetch("/api/news", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ article: articleText }),
+      });
+      const data = await res.json();
+      if (res.ok && data.neutralSummary) {
+        setNeutralSummaries((prev) => ({
+          ...prev,
+          [articleId]: data.neutralSummary,
+        }));
+      } else {
+        setRewriteError((prev) => ({
+          ...prev,
+          [articleId]: data.error || "Failed to rewrite article",
+        }));
+      }
+    } catch {
+      setRewriteError((prev) => ({
+        ...prev,
+        [articleId]: "Failed to rewrite article",
+      }));
+    } finally {
+      setRewriteLoading((prev) => ({ ...prev, [articleId]: false }));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground p-4 sm:p-8 font-sans">
       <header className="mb-10 text-center">
@@ -80,13 +119,11 @@ export default function Home() {
             key={article.id}
             className="flex flex-col sm:flex-row bg-white dark:bg-[#181818] rounded-lg shadow-md overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-shadow"
           >
-            <div className="flex-shrink-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900 w-full sm:w-48 h-40 sm:h-auto">
+            <div className="flex-shrink-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900 w-full sm:w-48 h-40">
               <img
                 src={article.image}
                 alt={article.title}
-                width={80}
-                height={80}
-                className="object-contain"
+                className="object-contain w-full h-full"
               />
             </div>
             <div className="flex flex-col p-6 gap-2 flex-1">
@@ -107,6 +144,28 @@ export default function Home() {
               >
                 Read more
               </a>
+              <button
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => handleRewrite(article.id, article.summary)}
+                disabled={rewriteLoading[article.id]}
+              >
+                {rewriteLoading[article.id]
+                  ? "Rewriting..."
+                  : "Rewrite Neutrally"}
+              </button>
+              {rewriteError[article.id] && (
+                <div className="mt-2 text-red-500 text-sm">
+                  {rewriteError[article.id]}
+                </div>
+              )}
+              {neutralSummaries[article.id] && (
+                <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
+                  <strong>Neutral Rewrite:</strong>
+                  <div className="mt-2 whitespace-pre-line">
+                    {neutralSummaries[article.id]}
+                  </div>
+                </div>
+              )}
             </div>
           </article>
         ))}
