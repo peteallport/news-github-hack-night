@@ -117,17 +117,27 @@ export default function Home() {
         {articles.map((article) => (
           <article
             key={article.id}
-            className="flex flex-col sm:flex-row bg-white dark:bg-[#181818] rounded-lg shadow-md overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-shadow"
+            className="group flex flex-col sm:flex-row bg-white dark:bg-[#181818] rounded-lg shadow-md overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-shadow cursor-pointer relative"
           >
-            <div className="flex-shrink-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900 w-full sm:w-48 h-40">
+            <a
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute inset-0 z-10"
+              tabIndex={-1}
+              aria-label={`Go to article: ${article.title}`}
+            />
+            <div className="flex-shrink-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900 w-full sm:w-48 h-40 z-20">
               <img
                 src={article.image}
                 alt={article.title}
                 className="object-contain w-full h-full"
               />
             </div>
-            <div className="flex flex-col p-6 gap-2 flex-1">
-              <h2 className="text-2xl font-semibold mb-1">{article.title}</h2>
+            <div className="flex flex-col p-6 gap-2 flex-1 z-20">
+              <h2 className="text-2xl font-semibold mb-1 group-hover:underline">
+                {article.title}
+              </h2>
               <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-2">
                 <span>{article.source}</span>
                 <span>•</span>
@@ -140,13 +150,17 @@ export default function Home() {
                 href={article.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="self-start mt-auto text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
+                className="self-start mt-auto text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium z-30"
+                onClick={(e) => e.stopPropagation()}
               >
                 Read more
               </a>
               <button
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={() => handleRewrite(article.id, article.summary)}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed z-30"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRewrite(article.id, article.summary);
+                }}
                 disabled={rewriteLoading[article.id]}
               >
                 {rewriteLoading[article.id]
